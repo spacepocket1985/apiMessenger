@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid2';
 
 export const Wrapper: React.FC<{
   children: React.ReactNode;
-  title: string;
+  title?: string;
 }> = ({ children, title }) => {
   return (
     <Grid
