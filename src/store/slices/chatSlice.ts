@@ -1,6 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { sendMessage, setupWebhook } from '../../service/greenApi';
+import { sendMessage } from '../../service/greenApi';
+import { getUserData } from '../../service/getUserData';
 
 type SendMessageResponse = {
   message: string;
@@ -12,6 +13,7 @@ type ChatState = {
   idInstance: string;
   apiTokenInstance: string;
   messages: string[];
+  chats: string[];
   loading: boolean;
   error: string | null;
 };
@@ -20,6 +22,7 @@ const initialState: ChatState = {
   idInstance: '',
   apiTokenInstance: '',
   messages: [],
+  chats: [],
   loading: false,
   error: null,
 };
@@ -30,6 +33,15 @@ type SendMessageArgs = {
   chatId: string;
   message: string;
 };
+
+export const setUserDataThunk = createAsyncThunk<
+  string[],
+  { idInstance: string; apiTokenInstance: string }
+>('chat/setUserData', async ({ idInstance, apiTokenInstance }) => {
+  const response = await getUserData(idInstance, apiTokenInstance);
+  console.log(response);
+  return response;
+});
 
 export const sendMessageThunk = createAsyncThunk<
   SendMessageResponse,
@@ -47,33 +59,10 @@ export const sendMessageThunk = createAsyncThunk<
   }
 );
 
-export const setupWebhookThunk = createAsyncThunk<
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  void,
-  { idInstance: string; apiTokenInstance: string }
->('chat/setupWebhook', async ({ idInstance, apiTokenInstance }) => {
-  await setupWebhook(idInstance, apiTokenInstance);
-});
-
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
-  reducers: {
-    setCredentials(
-      state,
-      action: PayloadAction<{ idInstance: string; apiTokenInstance: string }>
-    ) {
-      const { idInstance, apiTokenInstance } = action.payload;
-      state.idInstance = idInstance;
-      state.apiTokenInstance = apiTokenInstance;
-    },
-    addMessage(state, action: PayloadAction<string>) {
-      state.messages.push(action.payload);
-    },
-    clearMessages(state) {
-      state.messages = [];
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(sendMessageThunk.pending, (state) => {
@@ -88,9 +77,16 @@ const chatSlice = createSlice({
       .addCase(sendMessageThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to send message';
+      })
+      .addCase(setUserDataThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(setUserDataThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.chats = action.payload;
       });
   },
 });
 
-export const { setCredentials, addMessage, clearMessages } = chatSlice.actions;
 export default chatSlice.reducer;

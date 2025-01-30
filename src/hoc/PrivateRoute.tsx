@@ -9,7 +9,6 @@ type PrivateRouteProps = {
 };
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ element: Element }) => {
-  console.log(!isAuth());
   if (!isAuth()) {
     return <Navigate to={RoutePaths.LOGIN} replace />;
   }

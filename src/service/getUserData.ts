@@ -1,9 +1,7 @@
 import { Method, MessageType } from '../types';
 import { setAuthData } from '../utils/localStorageActions';
 
-const API_URL = 'api.greenapi.com';
-//const idInstance = '7105182998';
-//const apiTokenInstance = '79d517639c574bbba2b5578e2c2b501b15d5cec40f744be3be';
+const API_URL = '.api.greenapi.com';
 
 const fetchMessages = async (
   idInstance: string,
@@ -18,7 +16,7 @@ const fetchMessages = async (
   return response.json();
 };
 
-export const getChatsId = async (
+export const getUserData = async (
   idInstance: string,
   apiTokenInstance: string
 ) => {

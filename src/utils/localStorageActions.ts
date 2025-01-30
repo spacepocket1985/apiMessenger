@@ -11,9 +11,9 @@ const isAuth = () =>
     (key) => localStorage.getItem(key) !== null
   );
 
-const removeToken = (): void => {
+const removeAuthData = (): void => {
   localStorage.removeItem(storageKeyIdInstance);
   localStorage.removeItem(storageKeyApiToken);
 };
 
-export { setAuthData, isAuth, removeToken };
+export { setAuthData, isAuth, removeAuthData };
