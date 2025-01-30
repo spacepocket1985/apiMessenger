@@ -1,18 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-import { sendMessage } from '../../service/greenApi2';
 import {
   getChatHistory,
+  getMessage,
   getStateInstance,
   getUserData,
+  sendMessage,
 } from '../../service/greenApi';
 import { MessageType } from '../../types';
-
-type SendMessageResponse = {
-  message: string;
-  status: string;
-  timestamp: string;
-};
 
 type ChatState = {
   activeChat: string | null;
@@ -28,13 +23,6 @@ const initialState: ChatState = {
   chats: [],
   loading: false,
   error: null,
-};
-
-type SendMessageArgs = {
-  idInstance: string;
-  apiTokenInstance: string;
-  chatId: string;
-  message: string;
 };
 
 export const setCredentialThunk = createAsyncThunk<
@@ -62,20 +50,20 @@ export const getChatHistoryThunk = createAsyncThunk<MessageType[], string>(
 );
 
 export const sendMessageThunk = createAsyncThunk<
-  SendMessageResponse,
-  SendMessageArgs
->(
-  'chat/sendMessage',
-  async ({ idInstance, apiTokenInstance, chatId, message }) => {
-    const response = await sendMessage(
-      idInstance,
-      apiTokenInstance,
-      chatId,
-      message
-    );
-    return response;
-  }
-);
+  string,
+  { chatId: string; message: string }
+>('chat/sendMessage', async ({ chatId, message }) => {
+  const response = await sendMessage(chatId, message);
+  return response;
+});
+
+export const getMessageThunk = createAsyncThunk<
+  MessageType,
+  { chatId: string; idMessage: string }
+>('chat/getMessage', async ({ chatId, idMessage }) => {
+  const response = await getMessage(chatId, idMessage);
+  return response;
+});
 
 const chatSlice = createSlice({
   name: 'chat',
@@ -91,11 +79,14 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      // .addCase(sendMessageThunk.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   const message = action.payload.message;
-      //   state.messages.push(`Я: ${message}`);
-      // })
+      .addCase(
+        getMessageThunk.fulfilled,
+        (state, action: PayloadAction<MessageType>) => {
+          state.loading = false;
+          const message = action.payload;
+          state.messages.push(message);
+        }
+      )
       .addCase(sendMessageThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to send message';

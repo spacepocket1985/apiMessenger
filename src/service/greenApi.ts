@@ -84,3 +84,55 @@ export const getChatHistory = async (
 
   return data;
 };
+
+export const getMessage = async (
+  chatId: string,
+  idMessage: string
+): Promise<MessageType> => {
+  const API_URL = makeApiURL(Method.GetMessage);
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      chatId,
+      idMessage,
+    }),
+  });
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(errorResponse.error || 'Error get message');
+  }
+  const data: MessageType = await response.json();
+  console.log(data);
+
+  return data;
+};
+
+export const sendMessage = async (chatId: string, message: string) => {
+  const API_URL = makeApiURL(Method.SendMessage);
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      chatId,
+      message,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(errorResponse.error || 'Error sending message');
+  }
+
+  const { idMessage } = (await response.json()) as {
+    idMessage: string;
+  };
+  //const msg = await getMessage(chatId, idMessage);
+
+  return idMessage;
+};

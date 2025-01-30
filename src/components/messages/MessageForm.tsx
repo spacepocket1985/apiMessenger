@@ -1,15 +1,31 @@
 import { Box, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../hooks/storeHooks';
+import {
+  getMessageThunk,
+  sendMessageThunk,
+} from '../../store/slices/chatSlice';
 
 export const MessageForm: React.FC = () => {
+  const { activeChat } = useAppSelector((state) => state.chats);
+  const dispatch = useAppDispatch();
   const [message, setMessage] = useState('');
-  const isValid = () => message.length > 0;
+  const isValid = () => message.length > 0 && activeChat;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(message);
-    setMessage('');
+    const result = await dispatch(
+      sendMessageThunk({ chatId: activeChat!, message })
+    );
+    if (result.meta.requestStatus === 'fulfilled') {
+      await dispatch(
+        getMessageThunk({
+          idMessage: result.payload as string,
+          chatId: activeChat!,
+        })
+      );
+    }
   };
 
   return (
@@ -30,7 +46,7 @@ export const MessageForm: React.FC = () => {
         placeholder={'Write here your message'}
         type="text"
         value={message}
-        onChange={(e) => setMessage(e.currentTarget.value.trim())}
+        onChange={(e) => setMessage(e.currentTarget.value)}
         autoComplete=""
         size="small"
         required

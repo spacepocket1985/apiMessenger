@@ -14,7 +14,7 @@ export const Chat: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) => {
       sx={{
         cursor: 'pointer',
         border: activeChat === phoneNumber ? '2px solid #2e7d32' : 'none',
-        borderRadius: 10,
+        borderRadius: 5,
         mb: 1.5,
       }}
     >

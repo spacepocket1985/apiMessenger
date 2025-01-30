@@ -18,4 +18,6 @@ export enum Method {
   Outgoing = 'lastOutgoingMessages',
   StateInstance = 'getStateInstance',
   GetChatHistory = 'getChatHistory',
+  SendMessage = 'sendMessage',
+  GetMessage = 'getMessage',
 }
