@@ -1,57 +1,86 @@
-const API_URL = 'https://7105.api.greenapi.com';
+import { Method, MessageType } from '../types';
+import { getAuthData, setAuthData } from '../utils/localStorageActions';
 
-export const sendMessage = async (
-  idInstance: string,
-  apiTokenInstance: string,
-  chatId: string,
-  message: string
-) => {
-  const response = await fetch(
-    `${API_URL}/waInstance${idInstance}/sendMessage/${apiTokenInstance}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chatId: `${chatId}@c.us`,
-        message: message,
-      }),
-    }
-  );
+export const makeApiURL = (method: Method, id?: string, apiToken?: string) => {
+  const [idLS, apiTokenLS] = getAuthData();
+  const idInstance = id || idLS!;
+  const apiTokenInstance = apiToken || apiTokenLS;
 
-  if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.error || 'Error sending message');
-  }
-
-  return await response.json();
+  const url = `https://${idInstance.slice(0, 4)}.api.greenapi.com/waInstance${idInstance}/${method}/${apiTokenInstance}`;
+  return url;
 };
 
-export const setupWebhook = async (
+const fetchMessages = async (method: Method) => {
+  const API_URL = makeApiURL(method);
+  const response = await fetch(`${API_URL}?minutes=1440`);
+
+  if (!response.ok) throw new Error('Fetch failed');
+  return response.json();
+};
+
+export const getUserData = async () => {
+  const chatIdsSet = new Set<string>();
+
+  try {
+    const [incomingMessages, outgoingMessages] = await Promise.all([
+      fetchMessages(Method.Incoming),
+      fetchMessages(Method.Outgoing),
+    ]);
+
+    incomingMessages.forEach((message: MessageType) =>
+      chatIdsSet.add(message.chatId)
+    );
+
+    outgoingMessages.forEach((message: MessageType) =>
+      chatIdsSet.add(message.chatId)
+    );
+
+    return Array.from(chatIdsSet);
+  } catch (error) {
+    console.error('Error fetching chat IDs:', error);
+    throw error;
+  }
+};
+
+export const getStateInstance = async (
   idInstance: string,
   apiTokenInstance: string
-) => {
-  const response = await fetch(
-    `${API_URL}/waInstance${idInstance}/setSettings/${apiTokenInstance}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        webhookUrl: '',
-        outgoingWebhook: 'yes',
-        stateWebhook: 'yes',
-        incomingWebhook: 'yes',
-      }),
-    }
+): Promise<string> => {
+  const API_URL = makeApiURL(
+    Method.StateInstance,
+    idInstance,
+    apiTokenInstance
   );
-
+  const response = await fetch(API_URL);
   if (!response.ok) {
     const errorResponse = await response.json();
-    throw new Error(errorResponse.error || 'Error setting up webhook');
+    throw new Error(errorResponse.error || 'Error get instance status');
   }
+  const data = (await response.json()) as { stateInstance: string };
+  if (data.stateInstance === 'authorized')
+    setAuthData(idInstance, apiTokenInstance);
+  return data.stateInstance;
+};
 
-  return await response.json();
+export const getChatHistory = async (
+  chatId: string
+): Promise<MessageType[]> => {
+  const API_URL = makeApiURL(Method.GetChatHistory);
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      chatId,
+      count: 20,
+    }),
+  });
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(errorResponse.error || 'Error get chat history');
+  }
+  const data: MessageType[] = await response.json();
+
+  return data;
 };

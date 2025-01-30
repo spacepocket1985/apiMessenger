@@ -4,7 +4,7 @@ import { Box, TextField, Button } from '@mui/material';
 import { Wrapper } from '../components/wrapper/Wrapper';
 import { useAppDispatch } from '../hooks/storeHooks';
 import { RoutePaths } from '../routes/routePaths';
-import { setUserDataThunk } from '../store/slices/chatSlice';
+import { setCredentialThunk } from '../store/slices/chatSlice';
 
 const Login: React.FC = () => {
   const [idInstance, setIdInstance] = useState('');
@@ -17,7 +17,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const loginResult = await dispatch(
-      setUserDataThunk({ idInstance, apiTokenInstance })
+      setCredentialThunk({ idInstance, apiTokenInstance })
     );
     if (loginResult.meta.requestStatus === 'fulfilled') {
       navigate(RoutePaths.MAIN);

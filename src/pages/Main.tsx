@@ -3,8 +3,17 @@ import Paper from '@mui/material/Paper';
 
 import { ChatList } from '../components/chats/ChatList';
 import { MessageForm } from '../components/messages/MessageForm';
+import { useEffect } from 'react';
+import { useAppDispatch } from '../hooks/storeHooks';
+
+import { setUserDataThunk } from '../store/slices/chatSlice';
+import { MessagesList } from '../components/messages/MessagesList';
 
 const Main: React.FC = () => {
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(setUserDataThunk());
+  }, [dispatch]);
   return (
     <Paper sx={{ width: '80%', margin: 'auto', mt: 3 }}>
       <Grid container spacing={1}>
@@ -19,8 +28,10 @@ const Main: React.FC = () => {
             flexDirection: 'column',
             display: 'flex',
             justifyContent: 'flex-end',
+            gap: 2,
           }}
         >
+          <MessagesList />
           <MessageForm />
         </Grid>
       </Grid>

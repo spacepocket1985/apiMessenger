@@ -16,4 +16,6 @@ export type MessageType = {
 export enum Method {
   Incoming = `lastIncomingMessages`,
   Outgoing = 'lastOutgoingMessages',
+  StateInstance = 'getStateInstance',
+  GetChatHistory = 'getChatHistory',
 }
