@@ -1,9 +1,16 @@
-import { getChatsId } from './service/getChatsId';
+import { FC } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+
+import { AppRouter } from './routes/AppRouter';
+
 import './App.css';
 
-function App() {
-  getChatsId().then((data) => console.log(data));
-  return <h2>App</h2>;
-}
+const App: FC = () => {
+  return (
+    <Router>
+      <AppRouter />
+    </Router>
+  );
+};
 
 export default App;
