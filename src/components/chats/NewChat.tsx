@@ -13,6 +13,7 @@ export const NewChat: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await dispatch(checkWhatsappThunk(String(phone)));
+    setPhone('');
   };
 
   return (

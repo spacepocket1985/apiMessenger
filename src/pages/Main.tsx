@@ -6,15 +6,46 @@ import { MessageForm } from '../components/messages/MessageForm';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/storeHooks';
 
-import { setUserDataThunk } from '../store/slices/chatSlice';
+import { getMessageThunk, setUserDataThunk } from '../store/slices/chatSlice';
 import { MessagesList } from '../components/messages/MessagesList';
 import { Snack } from '../components/snack/Snack';
+import { deleteNotification, receiveNotification } from '../service/greenApi';
 
 const Main: React.FC = () => {
   const dispatch = useAppDispatch();
   const { error } = useAppSelector((state) => state.chats);
   useEffect(() => {
     dispatch(setUserDataThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const startPolling = () => {
+      let notificationPolling: number | null = null;
+
+      const fetchNotifications = async () => {
+        try {
+          const notification = await receiveNotification();
+          if (notification) {
+            await deleteNotification(notification.receiptId);
+            const idMessage = notification.body.idMessage;
+            const chatId = notification.body.senderData.chatId;
+            await dispatch(getMessageThunk({ chatId, idMessage }));
+          }
+        } catch (error) {
+          console.error('Ошибка при получении уведомления:', error);
+        }
+      };
+
+      notificationPolling = setInterval(fetchNotifications, 10000);
+
+      return () => {
+        if (notificationPolling) {
+          clearInterval(notificationPolling);
+        }
+      };
+    };
+
+    startPolling();
   }, [dispatch]);
 
   return (

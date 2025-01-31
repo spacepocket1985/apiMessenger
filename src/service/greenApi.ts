@@ -1,4 +1,4 @@
-import { Method, MessageType } from '../types';
+import { Method, MessageType, NotificationType } from '../types';
 import { getAuthData, setAuthData } from '../utils/localStorageActions';
 
 export const makeApiURL = (method: Method, id?: string, apiToken?: string) => {
@@ -72,7 +72,7 @@ export const getChatHistory = async (
     },
     body: JSON.stringify({
       chatId,
-      count: 20,
+      count: 10,
     }),
   });
   if (!response.ok) {
@@ -105,7 +105,6 @@ export const getMessage = async (
   }
 
   const data: MessageType = await response.json();
-  console.log('data ->', data);
 
   return data;
 };
@@ -153,9 +152,37 @@ export const checkWhatsapp = async (phoneNumber: string) => {
   const { existsWhatsapp } = (await response.json()) as {
     existsWhatsapp: boolean;
   };
-  console.log('existsWhatsapp ', existsWhatsapp);
+
   if (!existsWhatsapp)
     throw new Error('WhatsApp is not installed on this phone number');
 
   return `${phoneNumber}@c.us`;
+};
+
+export const receiveNotification =
+  async (): Promise<NotificationType | null> => {
+    const API_URL = makeApiURL(Method.ReceiveNotification);
+
+    const response = await fetch(API_URL, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Error receiving notification');
+    }
+
+    const data = await response.json();
+
+    if (data && data.receiptId) {
+      return data as NotificationType;
+    }
+
+    return null;
+  };
+
+export const deleteNotification = async (id: number) => {
+  const API_URL = makeApiURL(Method.DeleteNotification);
+  await fetch(`${API_URL}/${id}`, {
+    method: 'delete',
+  });
 };

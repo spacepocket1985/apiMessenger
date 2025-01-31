@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 import {
   checkWhatsapp,
@@ -79,7 +79,7 @@ const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    setActiveChat: (state, action) => {
+    setActiveChat: (state, action: PayloadAction<string>) => {
       state.activeChat = action.payload;
     },
     clearError: (state) => {
@@ -95,7 +95,14 @@ const chatSlice = createSlice({
       .addCase(sendMessageThunk.fulfilled, (state, action) => {
         state.loading = false;
         const message = action.payload;
-        state.messages.unshift(message);
+
+        const exists = state.messages.find(
+          (msg) => msg.idMessage === message.idMessage
+        );
+
+        if (!exists) {
+          state.messages.unshift(message);
+        }
       })
       .addCase(sendMessageThunk.rejected, (state, action) => {
         state.loading = false;
@@ -126,7 +133,8 @@ const chatSlice = createSlice({
         state.error = action.error.message || 'Failed add phone number';
       })
       .addCase(checkWhatsappThunk.fulfilled, (state, action) => {
-        state.chats.push(action.payload);
+        if (!state.chats.find((chat) => chat === action.payload))
+          state.chats.push(action.payload);
         state.activeChat = action.payload;
       })
       .addCase(setCredentialThunk.pending, (state) => {
@@ -139,6 +147,20 @@ const chatSlice = createSlice({
       })
       .addCase(setCredentialThunk.fulfilled, (state) => {
         state.loading = false;
+      })
+      .addCase(getMessageThunk.fulfilled, (state, action) => {
+        const message = action.payload;
+        const exists = state.messages.find(
+          (msg) => msg.idMessage === message.idMessage
+        );
+        const findChatId = state.chats.findIndex(
+          (chat) => chat === action.payload.chatId
+        );
+        if (findChatId === -1) state.chats.push(action.payload.chatId);
+        if (state.activeChat === action.payload.chatId)
+          if (!exists) {
+            state.messages.unshift(message);
+          }
       });
   },
 });

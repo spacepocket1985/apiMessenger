@@ -10,8 +10,12 @@ export const ChatList: React.FC = () => {
   ));
   return (
     <>
-      <Typography sx={{ textAlign: 'left', p: 2 }} component="h6" variant="h6">
-        Chart list
+      <Typography
+        sx={{ textAlign: 'left', p: 2, bgcolor: '#2e7d32', color: '#fff' }}
+        component="h6"
+        variant="h6"
+      >
+        Chat list
       </Typography>
       <List
         sx={{

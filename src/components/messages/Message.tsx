@@ -43,7 +43,7 @@ export const Message: React.FC<{ msg: MessageType }> = ({ msg }) => {
         sx={{
           borderRadius: 4,
           padding: 1,
-          maxWidth: '300px',
+          maxWidth: '350px',
           overflow: 'hidden',
         }}
       >

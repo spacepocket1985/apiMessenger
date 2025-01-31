@@ -6,14 +6,15 @@ import { useAppDispatch, useAppSelector } from '../../hooks/storeHooks';
 import { sendMessageThunk } from '../../store/slices/chatSlice';
 
 export const MessageForm: React.FC = () => {
-  const { activeChat } = useAppSelector((state) => state.chats);
+  const { activeChat, loading } = useAppSelector((state) => state.chats);
   const dispatch = useAppDispatch();
   const [message, setMessage] = useState('');
-  const isValid = () => message.length > 0 && activeChat;
+  const isValid = () => message.length > 0 && activeChat && !loading;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     await dispatch(sendMessageThunk({ chatId: activeChat!, message }));
+    setMessage('');
   };
 
   return (
