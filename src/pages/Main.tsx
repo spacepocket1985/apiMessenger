@@ -32,7 +32,6 @@ const Main: React.FC = () => {
             display: 'flex',
             justifyContent: 'flex-end',
             gap: 2,
-            overflowY: 'scroll',
           }}
         >
           <MessagesList />

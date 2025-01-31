@@ -37,8 +37,7 @@ export const getUserData = async () => {
 
     return Array.from(chatIdsSet);
   } catch (error) {
-    console.error('Error fetching chat IDs:', error);
-    throw error;
+    throw new Error(`Error fetching chat IDs:', ${error}`);
   }
 };
 
@@ -53,12 +52,12 @@ export const getStateInstance = async (
   );
   const response = await fetch(API_URL);
   if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.error || 'Error get instance status');
+    throw new Error('Error get instance status');
   }
   const data = (await response.json()) as { stateInstance: string };
   if (data.stateInstance === 'authorized')
     setAuthData(idInstance, apiTokenInstance);
+  else throw new Error('Authorization error, try again!');
   return data.stateInstance;
 };
 
@@ -77,8 +76,7 @@ export const getChatHistory = async (
     }),
   });
   if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.error || 'Error get chat history');
+    throw new Error('Error get chat history');
   }
   const data: MessageType[] = await response.json();
 
@@ -103,8 +101,7 @@ export const getMessage = async (
   });
 
   if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.error || 'Error get message');
+    throw new Error('Error get message');
   }
 
   const data: MessageType = await response.json();
@@ -127,8 +124,7 @@ export const sendMessage = async (chatId: string, message: string) => {
   });
 
   if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(errorResponse.error || 'Error sending message');
+    throw new Error('Error sending message');
   }
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const { idMessage } = (await response.json()) as {
@@ -152,10 +148,7 @@ export const checkWhatsapp = async (phoneNumber: string) => {
   });
 
   if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(
-      errorResponse.error || 'WhatsApp is not installed on this phone number'
-    );
+    throw new Error('WhatsApp is not installed on this phone number');
   }
   const { existsWhatsapp } = (await response.json()) as {
     existsWhatsapp: boolean;

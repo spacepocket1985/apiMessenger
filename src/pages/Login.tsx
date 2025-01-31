@@ -2,16 +2,18 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button } from '@mui/material';
 import { Wrapper } from '../components/wrapper/Wrapper';
-import { useAppDispatch } from '../hooks/storeHooks';
+import { useAppDispatch, useAppSelector } from '../hooks/storeHooks';
 import { RoutePaths } from '../routes/routePaths';
 import { setCredentialThunk } from '../store/slices/chatSlice';
+import { Snack } from '../components/snack/Snack';
+import { Spinner } from '../components/spinner/Spinner';
 
 const Login: React.FC = () => {
   const [idInstance, setIdInstance] = useState('');
   const [apiTokenInstance, setApiTokenInstance] = useState('');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  const { error, loading } = useAppSelector((state) => state.chats);
   const isValid = () => idInstance.length > 0 && apiTokenInstance.length > 0;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -24,42 +26,54 @@ const Login: React.FC = () => {
     }
   };
 
+  const spinnerOrContent = loading ? (
+    <Spinner />
+  ) : (
+    <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { width: '20rem' },
+        display: 'flex',
+        justifyContent: 'center',
+        alignContent: 'center',
+        flexDirection: 'column',
+        gap: 2,
+      }}
+      onSubmit={handleSubmit}
+    >
+      <TextField
+        label="Id instance"
+        type="text"
+        value={idInstance}
+        onChange={(e) => setIdInstance(e.currentTarget.value.trim())}
+        autoComplete=""
+        size="small"
+        required
+      />
+      <TextField
+        label="Api token instance"
+        type="text"
+        value={apiTokenInstance}
+        onChange={(e) => setApiTokenInstance(e.currentTarget.value.trim())}
+        autoComplete=""
+        size="small"
+        required
+      />
+      <Button type="submit" variant="contained" disabled={!isValid()}>
+        Submit
+      </Button>
+    </Box>
+  );
+  const isError = error ? (
+    <Snack color="danger" variant="solid">
+      {error}
+    </Snack>
+  ) : null;
+
   return (
     <Wrapper title="Login">
-      <Box
-        component="form"
-        sx={{
-          '& .MuiTextField-root': { width: '20rem' },
-          display: 'flex',
-          justifyContent: 'center',
-          alignContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-        }}
-        onSubmit={handleSubmit}
-      >
-        <TextField
-          label="Id instance"
-          type="text"
-          value={idInstance}
-          onChange={(e) => setIdInstance(e.currentTarget.value.trim())}
-          autoComplete=""
-          size="small"
-          required
-        />
-        <TextField
-          label="Api token instance"
-          type="text"
-          value={apiTokenInstance}
-          onChange={(e) => setApiTokenInstance(e.currentTarget.value.trim())}
-          autoComplete=""
-          size="small"
-          required
-        />
-        <Button type="submit" variant="contained" disabled={!isValid()}>
-          Submit
-        </Button>
-      </Box>
+      {spinnerOrContent}
+      {isError}
     </Wrapper>
   );
 };

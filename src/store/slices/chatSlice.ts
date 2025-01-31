@@ -82,6 +82,9 @@ const chatSlice = createSlice({
     setActiveChat: (state, action) => {
       state.activeChat = action.payload;
     },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -125,9 +128,20 @@ const chatSlice = createSlice({
       .addCase(checkWhatsappThunk.fulfilled, (state, action) => {
         state.chats.push(action.payload);
         state.activeChat = action.payload;
+      })
+      .addCase(setCredentialThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(setCredentialThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Login error, try again';
+      })
+      .addCase(setCredentialThunk.fulfilled, (state) => {
+        state.loading = false;
       });
   },
 });
 
 export default chatSlice.reducer;
-export const { setActiveChat } = chatSlice.actions;
+export const { setActiveChat, clearError } = chatSlice.actions;
