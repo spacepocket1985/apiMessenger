@@ -1,6 +1,7 @@
 import { List, Typography } from '@mui/material';
 import { useAppSelector } from '../../hooks/storeHooks';
 import { Chat } from './Chat';
+import { NewChat } from './NewChat';
 
 export const ChatList: React.FC = () => {
   const { chats } = useAppSelector((state) => state.chats);
@@ -21,6 +22,8 @@ export const ChatList: React.FC = () => {
       >
         {renderChats}
       </List>
+
+      <NewChat />
     </>
   );
 };

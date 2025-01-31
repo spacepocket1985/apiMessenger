@@ -1,6 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 import {
+  checkWhatsapp,
   getChatHistory,
   getMessage,
   getStateInstance,
@@ -50,8 +51,9 @@ export const getChatHistoryThunk = createAsyncThunk<MessageType[], string>(
 );
 
 export const sendMessageThunk = createAsyncThunk<
-  string,
-  { chatId: string; message: string }
+  MessageType,
+  { chatId: string; message: string },
+  { rejectValue: string }
 >('chat/sendMessage', async ({ chatId, message }) => {
   const response = await sendMessage(chatId, message);
   return response;
@@ -65,11 +67,19 @@ export const getMessageThunk = createAsyncThunk<
   return response;
 });
 
+export const checkWhatsappThunk = createAsyncThunk<string, string>(
+  'chat/checkWhatsapp',
+  async (phoneNumber) => {
+    const response = await checkWhatsapp(phoneNumber);
+    return response;
+  }
+);
+
 const chatSlice = createSlice({
   name: 'chat',
   initialState,
   reducers: {
-    setActiveChat: (state, action: PayloadAction<string>) => {
+    setActiveChat: (state, action) => {
       state.activeChat = action.payload;
     },
   },
@@ -79,14 +89,11 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        getMessageThunk.fulfilled,
-        (state, action: PayloadAction<MessageType>) => {
-          state.loading = false;
-          const message = action.payload;
-          state.messages.push(message);
-        }
-      )
+      .addCase(sendMessageThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        const message = action.payload;
+        state.messages.unshift(message);
+      })
       .addCase(sendMessageThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to send message';
@@ -110,6 +117,14 @@ const chatSlice = createSlice({
       .addCase(getChatHistoryThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed fetch messages';
+      })
+      .addCase(checkWhatsappThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || 'Failed add phone number';
+      })
+      .addCase(checkWhatsappThunk.fulfilled, (state, action) => {
+        state.chats.push(action.payload);
+        state.activeChat = action.payload;
       });
   },
 });

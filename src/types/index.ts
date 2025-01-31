@@ -20,4 +20,5 @@ export enum Method {
   GetChatHistory = 'getChatHistory',
   SendMessage = 'sendMessage',
   GetMessage = 'getMessage',
+  CheckWhatsapp = 'checkWhatsapp',
 }

@@ -101,12 +101,14 @@ export const getMessage = async (
       idMessage,
     }),
   });
+
   if (!response.ok) {
     const errorResponse = await response.json();
     throw new Error(errorResponse.error || 'Error get message');
   }
+
   const data: MessageType = await response.json();
-  console.log(data);
+  console.log('data ->', data);
 
   return data;
 };
@@ -128,11 +130,39 @@ export const sendMessage = async (chatId: string, message: string) => {
     const errorResponse = await response.json();
     throw new Error(errorResponse.error || 'Error sending message');
   }
-
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   const { idMessage } = (await response.json()) as {
     idMessage: string;
   };
-  //const msg = await getMessage(chatId, idMessage);
 
-  return idMessage;
+  const msg = await getMessage(chatId, idMessage);
+
+  return msg;
+};
+
+export const checkWhatsapp = async (phoneNumber: string) => {
+  const API_URL = makeApiURL(Method.CheckWhatsapp);
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ phoneNumber }),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(
+      errorResponse.error || 'WhatsApp is not installed on this phone number'
+    );
+  }
+  const { existsWhatsapp } = (await response.json()) as {
+    existsWhatsapp: boolean;
+  };
+  console.log('existsWhatsapp ', existsWhatsapp);
+  if (!existsWhatsapp)
+    throw new Error('WhatsApp is not installed on this phone number');
+
+  return `${phoneNumber}@c.us`;
 };

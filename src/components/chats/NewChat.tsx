@@ -1,19 +1,18 @@
 import { Box, Button, TextField } from '@mui/material';
-
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import PhoneInTalkIcon from '@mui/icons-material/PhoneInTalk';
 import { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/storeHooks';
-import { sendMessageThunk } from '../../store/slices/chatSlice';
+import { useAppDispatch } from '../../hooks/storeHooks';
+import { checkWhatsappThunk } from '../../store/slices/chatSlice';
 
-export const MessageForm: React.FC = () => {
-  const { activeChat } = useAppSelector((state) => state.chats);
+export const NewChat: React.FC = () => {
+  const [phone, setPhone] = useState('');
+  const isValid = () => phone.length > 6;
+
   const dispatch = useAppDispatch();
-  const [message, setMessage] = useState('');
-  const isValid = () => message.length > 0 && activeChat;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await dispatch(sendMessageThunk({ chatId: activeChat!, message }));
+    await dispatch(checkWhatsappThunk(String(phone)));
   };
 
   return (
@@ -24,18 +23,18 @@ export const MessageForm: React.FC = () => {
     >
       <Button
         variant="contained"
-        endIcon={<AddCircleIcon />}
+        endIcon={<PhoneInTalkIcon />}
         aria-label="add"
         type="submit"
         disabled={!isValid()}
       >
-        Send
+        Add
       </Button>
       <TextField
-        placeholder={'Write here your message'}
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.currentTarget.value)}
+        placeholder={'Add phone number'}
+        type="number"
+        value={phone}
+        onChange={(e) => setPhone(e.currentTarget.value)}
         autoComplete=""
         size="small"
         required
