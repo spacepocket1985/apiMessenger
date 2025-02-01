@@ -1,4 +1,5 @@
-import { List, Typography } from '@mui/material';
+import { Box, Button, List, Typography } from '@mui/material';
+import ArticleIcon from '@mui/icons-material/Article';
 import { useAppSelector } from '../../hooks/storeHooks';
 import { Chat } from './Chat';
 import { NewChat } from './NewChat';
@@ -10,13 +11,28 @@ export const ChatList: React.FC = () => {
   ));
   return (
     <>
-      <Typography
-        sx={{ textAlign: 'left', p: 2, bgcolor: '#2e7d32', color: '#fff' }}
-        component="h6"
-        variant="h6"
+      <Box
+        display={'flex'}
+        justifyContent={'space-between'}
+        gap={2}
+        sx={{ bgcolor: '#2e7d32' }}
       >
-        Chat list
-      </Typography>
+        <Typography
+          sx={{ textAlign: 'left', p: 2, color: '#fff' }}
+          component="h6"
+          variant="h6"
+        >
+          ChatList
+        </Typography>
+        <Button
+          variant="outlined"
+          endIcon={<ArticleIcon />}
+          sx={{ color: '#fff' }}
+          color="success"
+        >
+          GreenApi
+        </Button>
+      </Box>
       <List
         sx={{
           width: '95%',

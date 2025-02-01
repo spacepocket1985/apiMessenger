@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, TextField, Button } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { Box, TextField, Button, Typography } from '@mui/material';
 import { Wrapper } from '../components/wrapper/Wrapper';
 import { useAppDispatch, useAppSelector } from '../hooks/storeHooks';
 import { RoutePaths } from '../routes/routePaths';
@@ -62,6 +62,10 @@ const Login: React.FC = () => {
       <Button type="submit" variant="contained" disabled={!isValid()}>
         Submit
       </Button>
+      <Typography sx={{ textAlign: 'center' }}>
+        Dont have an account?{' '}
+        <Link to={'https://green-api.com/'}>Register.</Link>
+      </Typography>
     </Box>
   );
   const isError = error ? (

@@ -13,7 +13,8 @@ export const Chat: React.FC<{ phoneNumber: string }> = ({ phoneNumber }) => {
       onClick={() => handleClick(phoneNumber)}
       sx={{
         cursor: 'pointer',
-        border: activeChat === phoneNumber ? '2px solid #2e7d32' : 'none',
+        border: activeChat === phoneNumber ? '3px solid #2e7d32' : 'none',
+
         borderRadius: 5,
         mb: 1.5,
       }}

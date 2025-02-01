@@ -24,6 +24,7 @@ export const NewChat: React.FC = () => {
     >
       <Button
         variant="contained"
+        color="success"
         endIcon={<PhoneInTalkIcon />}
         aria-label="add"
         type="submit"

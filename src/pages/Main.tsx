@@ -1,12 +1,14 @@
+import { useEffect } from 'react';
 import Grid from '@mui/material/Grid2';
 import Paper from '@mui/material/Paper';
-
 import { ChatList } from '../components/chats/ChatList';
 import { MessageForm } from '../components/messages/MessageForm';
-import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/storeHooks';
-
-import { getMessageThunk, setUserDataThunk } from '../store/slices/chatSlice';
+import {
+  getMessageThunk,
+  setError,
+  setUserDataThunk,
+} from '../store/slices/chatSlice';
 import { MessagesList } from '../components/messages/MessagesList';
 import { Snack } from '../components/snack/Snack';
 import { deleteNotification, receiveNotification } from '../service/greenApi';
@@ -32,7 +34,7 @@ const Main: React.FC = () => {
             await dispatch(getMessageThunk({ chatId, idMessage }));
           }
         } catch (error) {
-          console.error('Ошибка при получении уведомления:', error);
+          dispatch(setError(`'Ошибка при получении уведомления:', ${error}`));
         }
       };
 
@@ -50,7 +52,7 @@ const Main: React.FC = () => {
 
   return (
     <Paper sx={{ width: '80%', margin: 'auto', mt: 3 }}>
-      <Grid container spacing={1}>
+      <Grid container>
         <Grid size={3}>
           <ChatList />
         </Grid>

@@ -12,7 +12,7 @@ export const Wrapper: React.FC<{
       spacing={2}
       size={3}
       sx={{
-        m: 'auto',
+        mt: 2,
         justifyContent: 'center',
         alignContent: 'center',
         borderRadius: 2,
@@ -25,7 +25,7 @@ export const Wrapper: React.FC<{
         sx={{
           padding: 1,
           textAlign: 'center',
-          bgcolor: '#1976d2',
+          bgcolor: '#2e7d32',
           borderRadius: 2,
           color: '#fff',
           width: '20rem',

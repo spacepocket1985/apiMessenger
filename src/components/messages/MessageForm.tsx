@@ -25,6 +25,7 @@ export const MessageForm: React.FC = () => {
     >
       <Button
         variant="contained"
+        color="success"
         endIcon={<AddCircleIcon />}
         aria-label="add"
         type="submit"

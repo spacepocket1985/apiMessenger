@@ -125,14 +125,11 @@ export const sendMessage = async (chatId: string, message: string) => {
   if (!response.ok) {
     throw new Error('Error sending message');
   }
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   const { idMessage } = (await response.json()) as {
     idMessage: string;
   };
-
-  const msg = await getMessage(chatId, idMessage);
-
-  return msg;
+  return idMessage;
 };
 
 export const checkWhatsapp = async (phoneNumber: string) => {

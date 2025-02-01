@@ -51,9 +51,8 @@ export const getChatHistoryThunk = createAsyncThunk<MessageType[], string>(
 );
 
 export const sendMessageThunk = createAsyncThunk<
-  MessageType,
-  { chatId: string; message: string },
-  { rejectValue: string }
+  string,
+  { chatId: string; message: string }
 >('chat/sendMessage', async ({ chatId, message }) => {
   const response = await sendMessage(chatId, message);
   return response;
@@ -85,6 +84,9 @@ const chatSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setError: (state, action: PayloadAction<string>) => {
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -92,17 +94,8 @@ const chatSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(sendMessageThunk.fulfilled, (state, action) => {
+      .addCase(sendMessageThunk.fulfilled, (state) => {
         state.loading = false;
-        const message = action.payload;
-
-        const exists = state.messages.find(
-          (msg) => msg.idMessage === message.idMessage
-        );
-
-        if (!exists) {
-          state.messages.unshift(message);
-        }
       })
       .addCase(sendMessageThunk.rejected, (state, action) => {
         state.loading = false;
@@ -124,10 +117,7 @@ const chatSlice = createSlice({
         state.loading = false;
         state.messages = action.payload;
       })
-      .addCase(getChatHistoryThunk.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed fetch messages';
-      })
+
       .addCase(checkWhatsappThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed add phone number';
@@ -150,15 +140,15 @@ const chatSlice = createSlice({
       })
       .addCase(getMessageThunk.fulfilled, (state, action) => {
         const message = action.payload;
-        const exists = state.messages.find(
+        const messageExists = state.messages.find(
           (msg) => msg.idMessage === message.idMessage
         );
-        const findChatId = state.chats.findIndex(
+        const chatIdIndex = state.chats.findIndex(
           (chat) => chat === action.payload.chatId
         );
-        if (findChatId === -1) state.chats.push(action.payload.chatId);
+        if (chatIdIndex === -1) state.chats.push(action.payload.chatId);
         if (state.activeChat === action.payload.chatId)
-          if (!exists) {
+          if (!messageExists) {
             state.messages.unshift(message);
           }
       });
@@ -166,4 +156,4 @@ const chatSlice = createSlice({
 });
 
 export default chatSlice.reducer;
-export const { setActiveChat, clearError } = chatSlice.actions;
+export const { setActiveChat, clearError, setError } = chatSlice.actions;
