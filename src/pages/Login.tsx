@@ -59,7 +59,12 @@ const Login: React.FC = () => {
         size="small"
         required
       />
-      <Button type="submit" variant="contained" disabled={!isValid()}>
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={!isValid()}
+        color="success"
+      >
         Submit
       </Button>
       <Typography sx={{ textAlign: 'center' }}>
