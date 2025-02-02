@@ -34,7 +34,7 @@ const Main: React.FC = () => {
             await dispatch(getMessageThunk({ chatId, idMessage }));
           }
         } catch (error) {
-          dispatch(setError(`'Ошибка при получении уведомления:', ${error}`));
+          dispatch(setError(`Error receiving notifications', ${error}`));
         }
       };
 

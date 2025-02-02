@@ -138,6 +138,10 @@ const chatSlice = createSlice({
       .addCase(setCredentialThunk.fulfilled, (state) => {
         state.loading = false;
       })
+      .addCase(getMessageThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(getMessageThunk.fulfilled, (state, action) => {
         const message = action.payload;
         const messageExists = state.messages.find(
@@ -151,6 +155,7 @@ const chatSlice = createSlice({
           if (!messageExists) {
             state.messages.unshift(message);
           }
+        state.loading = false;
       });
   },
 });
